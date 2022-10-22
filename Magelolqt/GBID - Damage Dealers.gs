@@ -2,6 +2,9 @@ function main() {
   var ss = SpreadsheetApp.getActiveSheet();
   let url = "https://classic.warcraftlogs.com/api/v2/client"
   let report = ss.getRange(1,7).getValue();
+  if(report == "")
+    throw new Error("Il n'y a pas de lien WCL en G1");
+	
   var regExp = new RegExp("reports\/(\\d*\\w*)", "gim");
   var reportCode = regExp.exec(report)[1];
 
