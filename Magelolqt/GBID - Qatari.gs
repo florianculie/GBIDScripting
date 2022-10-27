@@ -1,13 +1,25 @@
 function qatari() {
   var ss = SpreadsheetApp.getActiveSheet();
   //E5 to E85 - F5 to F85
-  let buys = ss.getRange(5, 5, 80, 2).getValues();
+  let buys1 = ss.getRange(5, 4, 45, 2).getValues();
+  let buys2 = ss.getRange(5, 10, 45, 2).getValues();
   let buyersTotal = []; 
   
-  for (counter = 0; counter < buys.length-1; counter = counter + 1){
-    var name = buys[counter][0].toLowerCase();
-    var price = buys[counter][1];
-    if(name == "dez"){
+  for (counter = 0; counter < buys1.length-1; counter = counter + 1){
+    var name = buys1[counter][0].toLowerCase();
+    var price = buys1[counter][1];
+    if(name == "dez" || name == ""){
+    }
+    else if(buyersTotal[name] == null){
+      buyersTotal[name] = price;
+    }else{
+      buyersTotal[name] = buyersTotal[name] + price;
+    }
+  }
+  for (counter = 0; counter < buys2.length-1; counter = counter + 1){
+    var name = buys2[counter][0].toLowerCase();
+    var price = buys2[counter][1];
+    if(name == "dez" || name == ""){
     }
     else if(buyersTotal[name] == null){
       buyersTotal[name] = price;
@@ -24,7 +36,7 @@ function qatari() {
     }
   })
 
-  let qatariCell = ss.getRange(35,10);
+  let qatariCell = ss.getRange(37,14);
   qatariCell.setValue(qatari);
   qatariCell.setFontColor("#FFFFFF");
 }

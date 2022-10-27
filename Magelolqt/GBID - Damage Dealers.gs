@@ -1,10 +1,10 @@
 function main() {
   var ss = SpreadsheetApp.getActiveSheet();
   let url = "https://classic.warcraftlogs.com/api/v2/client"
-  let report = ss.getRange(1,7).getValue();
+  let report = ss.getRange(4,4).getValue();
   if(report == "")
     throw new Error("Il n'y a pas de lien WCL en G1");
-	
+
   var regExp = new RegExp("reports\/(\\d*\\w*)", "gim");
   var reportCode = regExp.exec(report)[1];
 
@@ -29,10 +29,7 @@ function main() {
 
   var rankedPlayerMetrics = playerMetrics.sort(sortPlayers);
 
-  fillCellRange(16, 10, 1, rankedPlayerMetrics);
-
-  //var range = ss.getRange(16,10,nbPlayer,1);
-  //range.setValues(rankedPlayer);
+  fillCellRange(18, 14, 1, rankedPlayerMetrics);
 
   SpreadsheetApp.flush();
 
@@ -51,13 +48,13 @@ function fillCellRange(row, column, numColumns, rankedPlayerMetrics){
     rankedPlayerClasses.push(rankedPlayerMetrics[counter].type)
   }
 
-  var range = ss.getRange(16,10,nbPlayer,1);
+  var range = ss.getRange(row,column,nbPlayer,1);
   range.setValues(rankedPlayer);
   range.setFontColor('yellow');
   var lastrow = range.getLastRow();
 
   for (counter = nbPlayer-1; counter >= 0; counter = counter - 1){
-    var cell = ss.getRange(16+counter, 10, 1);
+    var cell = ss.getRange(row+counter, column, 1);
     cell.setFontColor(getClassColor(rankedPlayerClasses[counter]));
   }
 }
