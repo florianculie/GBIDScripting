@@ -1,7 +1,7 @@
 function qatari() {
   var ss = SpreadsheetApp.getActiveSheet();
   //E5 to E85 - F5 to F85
-  let buys1 = ss.getRange(5, 4, 45, 2).getValues();
+  let buys1 = ss.getRange(5, 5, 45, 2).getValues();
   let buys2 = ss.getRange(5, 10, 45, 2).getValues();
   let buyersTotal = []; 
   
