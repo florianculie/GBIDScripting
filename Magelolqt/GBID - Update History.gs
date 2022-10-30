@@ -1,4 +1,5 @@
 function updateHistory() {
+  const historyStartingRow = 371
   const bidSSId = "R25 WOTLK";
   const historySSId = "Historique";
   var bidSS = SpreadsheetApp.getActive().getSheetByName(bidSSId);
@@ -16,17 +17,20 @@ function updateHistory() {
   }
 
   var historySS =  SpreadsheetApp.getActive().getSheetByName(historySSId);
-  var historyRange = historySS.getRange(historySS.getLastRow()+1, 1, allBids.length, 4);
-  var styledRange = historySS.getRange(historySS.getLastRow()+1, 2, allBids.length, 3);
-  var priceRange = historySS.getRange(historySS.getLastRow()+1, 4, allBids.length, 1);
+  var apCol = historySS.getRange("AP"+historyStartingRow+":AP").getValues();
+  var lastRowAP = apCol.filter(String).length + (historyStartingRow-1);
+
+  var historyRange = historySS.getRange(lastRowAP+1, 42, allBids.length, 4);
+  var styledRange = historySS.getRange(lastRowAP+1, 43, allBids.length, 3);
+  var priceRange = historySS.getRange(lastRowAP+1, 45, allBids.length, 1);
   historyRange.setValues(rangeValues);
   styledRange.setBackground("#434343");
   styledRange.setFontColor("#FFFFFF");
   priceRange.setFontColor("#FBBC04");
   styledRange.setFontFamily("Oswald")
 
-  var endOfRaid = historySS.getRange(historySS.getLastRow()+1, 1, 1, 4);
-  var splitter = historySS.getRange(historySS.getLastRow()+1, 1, 1, 1);
+  var endOfRaid = historySS.getRange(lastRowAP+allBids.length+1, 42, 1, 4);
+  var splitter = historySS.getRange(lastRowAP+allBids.length+1, 42, 1, 1);
   endOfRaid.setBackground("#A4C5E8");
   splitter.setValues([["----------------------------"]]);
   splitter.setFontColor("#A4C5E8");
