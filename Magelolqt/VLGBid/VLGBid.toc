@@ -1,0 +1,6 @@
+## Interface: 30400
+## Title: VLGBid
+## Author: Vâlygar
+## Version: 1.0
+
+main.lua
