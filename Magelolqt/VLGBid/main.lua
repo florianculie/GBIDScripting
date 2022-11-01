@@ -86,4 +86,13 @@ SlashCmdList["VLGRESET"] = function(msg)
   bids = "";
 end
 
+SLASH_VLGHELP1 = "/vlghelp"
+SlashCmdList["VLGHELP"] = function(msg)
+  print("List of available commands:\r\n");
+  print(SLASH_VLGSTART1.." -- start registering a bid session");
+  print(SLASH_VLGSTOP1.." -- stop registering a bid session");
+  print(SLASH_VLGSHOW1.." -- display currently registered bids");
+  print(SLASH_VLGRESET1.." -- reset current bid session");
+end
+
 --message('My first addon!')
