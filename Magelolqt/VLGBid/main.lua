@@ -6,16 +6,20 @@ local price = 0;
 local item = "";
 local player = "";
 local bids = "";
-
+local isShowActive = false;
+local f;
+local scrollFrame;
+local editBox;
 
 local function evAcceptUpdate(self, event, arg1, arg2, ...)
   if(event == "TRADE_ACCEPT_UPDATE") then
     --print("trade event triggered " .. event .. " " .. arg1 .. " " .. arg2);
     --print("Traded " .. item .. " for " .. price);
     player = UnitName("target");
-    print(player)
+    --print(player)
     if(arg1 == 1 and arg2 == 1) then
       bids = bids .. item .. "," .. player .. "," .. price .. "\r\n";
+      editBox:SetText(bids);
     end
   end
 end
@@ -52,29 +56,63 @@ SlashCmdList["VLGSTOP"] = function(msg)
   acceptUpdate:UnregisterEvent("TRADE_ACCEPT_UPDATE");
   moneyChanged:UnregisterEvent("TRADE_MONEY_CHANGED");
   itemChanged:UnregisterEvent("TRADE_PLAYER_ITEM_CHANGED");
+  isShowActive = false;
   --print("bidsnew:" .. bids);
 end
 
 SLASH_VLGSHOW1 = "/vlgshow"
 SlashCmdList["VLGSHOW"] = function(msg)
-  print("Showing bids for current session")
-  local scrollFrame = CreateFrame("ScrollFrame", nil, UIParent, "UIPanelScrollFrameTemplate") -- or your actual parent instead
-  scrollFrame:SetSize(300,200)
-  scrollFrame:SetPoint("CENTER")
-  local editBox = CreateFrame("EditBox", nil, scrollFrame)
-  editBox:SetMultiLine(true)
-  editBox:SetFontObject(ChatFontNormal)
-  editBox:SetWidth(300)
-  scrollFrame:SetScrollChild(editBox)
-  editBox:SetText(bids)
-  --Top right X close button
-  local exitButton = CreateFrame("Button", "exitButton", scrollFrame, "UIPanelCloseButton");
-  exitButton:SetPoint("TOPRIGHT", 12, 27);
-  exitButton:SetWidth(29);
-  exitButton:SetHeight(29);
-  exitButton:SetScript("OnClick", function(self, arg)
-  	scrollFrame:Hide();
-  end)
+  if(not isShowActive)then
+    isShowActive = true;
+    print("Showing bids for current session")
+    f = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+    f:SetPoint("CENTER")
+    f:SetSize(280, 400)
+    f:SetBackdrop({
+      bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+      edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+      edgeSize = 16,
+      insets = { left = 4, right = 4, top = 4, bottom = 4 },
+    })
+    f:SetBackdropColor(0.1, 0.1, 0.1, .8)
+    f:SetMovable(true)
+    f:EnableMouse(true)
+    f:RegisterForDrag("LeftButton")
+    f:SetScript("OnDragStart", f.StartMoving)
+    f:SetScript("OnDragStop", f.StopMovingOrSizing)
+
+    scrollFrame = CreateFrame("ScrollFrame", "VLGBidScroll", f, "UIPanelScrollFrameTemplate") -- or your actual parent instead
+    scrollFrame:SetSize(210,325)
+    scrollFrame:SetPoint("CENTER")
+
+    scrollFrame["title"] = scrollFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge");
+    scrollFrame["title"]:SetPoint("TOPLEFT", 0, 27);
+    scrollFrame["title"]:SetText("Current session bids");
+    scrollFrame["title"]:Show();
+
+    editBox = CreateFrame("EditBox", "VLGBidEditBox", scrollFrame)
+    editBox:SetMultiLine(true)
+    editBox:SetFontObject(ChatFontNormal)
+    editBox:SetWidth(205)
+    scrollFrame:SetScrollChild(editBox)
+    editBox:SetText(bids)
+    editBox:HighlightText() -- select all (if to be used for copy paste)
+    -- optional/just to close that frame
+    editBox:SetScript("OnEscapePressed", function()
+      f:Hide()
+      isShowActive = false;
+    end)
+
+    --Top right X close button
+    local exitButton = CreateFrame("Button", "VLGExitButton", scrollFrame, "UIPanelCloseButton");
+    exitButton:SetPoint("TOPRIGHT", 0, 33);
+    exitButton:SetWidth(29);
+    exitButton:SetHeight(29);
+    exitButton:SetScript("OnClick", function(self, arg)
+    	f:Hide();
+      isShowActive = false;
+    end)
+  end
 end
 
 SLASH_VLGRESET1 = "/vlgreset"
