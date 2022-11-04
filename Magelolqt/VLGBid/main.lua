@@ -1,7 +1,11 @@
 local acceptUpdate = CreateFrame("FRAME", "acceptUpdate");
 local moneyChanged = CreateFrame("FRAME", "moneyChanged");
 local itemChanged = CreateFrame("FRAME", "itemChanged");
-
+local addonMessageFrame = CreateFrame("FRAME", "addonMessage");
+addonMessageFrame:RegisterEvent("CHAT_MSG_ADDON");
+local enteringWorldFrame = CreateFrame("FRAME", "enteringWorldFrame");
+enteringWorldFrame:RegisterEvent("PLAYER_ENTERING_WORLD");
+local addonPrefix = "VLGBid";
 local price = 0;
 local item = "";
 local player = "";
@@ -11,15 +15,22 @@ local f;
 local scrollFrame;
 local editBox;
 
+local function updateBids(newEntry)
+  --print("inside updtabids")
+  bids = bids .. newEntry;
+  C_ChatInfo.SendAddonMessage(addonPrefix, newEntry, "RAID");
+  editBox:SetText(bids);
+end
+
 local function evAcceptUpdate(self, event, arg1, arg2, ...)
   if(event == "TRADE_ACCEPT_UPDATE") then
     --print("trade event triggered " .. event .. " " .. arg1 .. " " .. arg2);
-    --print("Traded " .. item .. " for " .. price);
+
     player = UnitName("target");
     --print(player)
     if(arg1 == 1 and arg2 == 1) then
-      bids = bids .. item .. "," .. player .. "," .. price .. "\r\n";
-      editBox:SetText(bids);
+      print("Traded " .. item .. " for " .. price);
+      updateBids(item .. "," .. player .. "," .. price .. "\r\n");
     end
   end
 end
@@ -34,9 +45,43 @@ end
 local function evItemChanged(self, event, ...)
   if(event == "TRADE_PLAYER_ITEM_CHANGED") then
     item = GetTradePlayerItemLink(1);
-    print("item:"..item)
+    --print("item:"..item)
   end
 end
+
+local function split(s, sep)
+    local fields = {}
+
+    local sep = sep or " "
+    local pattern = string.format("([^%s]+)", sep)
+    string.gsub(s, pattern, function(c) fields[#fields + 1] = c end)
+    return fields
+end
+
+local function addonMessageEvents(self, event, prefix, msg, type, sender)
+  --print("event ".. event .. " prefix ".. prefix);
+  --print(C_ChatInfo.IsAddonMessagePrefixRegistered(addonPrefix))
+  local senderName = split(sender, "-")[1]
+  if prefix == addonPrefix and senderName ~= UnitName("player") then
+    --print("hello");
+    --print("event ".. event .. " prefix ".. prefix .." msg ".. msg.." type "..type.." sender "..sender);
+    --print(sender .. " vvvv "..UnitName("player"))
+
+    bids = bids .. msg
+    editBox:SetText(bids);
+  end
+end
+addonMessageFrame:SetScript("OnEvent", addonMessageEvents);
+
+local function enteringWorldEvent(self, event, ...)
+  if event == "PLAYER_ENTERING_WORLD" then
+		local isLogin, isReload = ...
+		if isLogin or isReload then
+			local success = C_ChatInfo.RegisterAddonMessagePrefix(addonPrefix)
+		end
+	end
+end
+enteringWorldFrame:SetScript("OnEvent", enteringWorldEvent);
 
 SLASH_VLGSTART1 = "/vlgstart"
 SlashCmdList["VLGSTART"] = function(msg)
@@ -131,6 +176,22 @@ SlashCmdList["VLGHELP"] = function(msg)
   print(SLASH_VLGSTOP1.." -- stop registering a bid session");
   print(SLASH_VLGSHOW1.." -- display currently registered bids");
   print(SLASH_VLGRESET1.." -- reset current bid session");
+  print(SLASH_VLGREGISTER1.." -- register a custom bid using the format [item] player price")
 end
+
+SLASH_VLGREGISTER1 = "/vlgregister"
+SlashCmdList["VLGREGISTER"] = function(msg)
+  --print(msg);
+  local firstsplit = split(msg, "]")
+  item = firstsplit[1] .."]"
+  player = split(firstsplit[2])[1]
+  price = split(firstsplit[2])[2] or " "
+  updateBids(item .. "," .. player .. "," .. price .. "\r\n");
+end
+
+
+
+
+
 
 --message('My first addon!')
