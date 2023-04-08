@@ -1,6 +1,6 @@
-function updateHistory() {
+function updateHistoryR10() {
   const historyStartingRow = 1756
-  const bidSSId = "R25 WOTLK";
+  const bidSSId = "R10 WOTLK";
   const historySSId = "Historique";
   var bidSS = SpreadsheetApp.getActive().getSheetByName(bidSSId);
 
