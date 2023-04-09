@@ -1,12 +1,11 @@
 function updateHistory() {
-  const historyStartingRow = 1756
-  const bidSSId = "R25 WOTLK";
+  const historyStartingRow = 1968
+  const bidSSId = "R10 WOTLK";
   const historySSId = "Historique";
   var bidSS = SpreadsheetApp.getActive().getSheetByName(bidSSId);
 
-  var firstBidRange = bidSS.getRange(5, 4, 45, 3).getValues();
-  var secondBidRange = bidSS.getRange(5, 9, 45, 3).getValues();
-  var allBids = firstBidRange.concat(secondBidRange);
+  var firstBidRange = bidSS.getRange(5, 4, 150, 3).getValues();
+  var allBids = firstBidRange
   allBids = allBids.filter(item => (item[0] != "" || item[1] != "" || item[2] != ""))
   var rangeValues = [];
   for(i = 0; i < allBids.length; i++){
